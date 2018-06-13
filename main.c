@@ -39,6 +39,7 @@ typedef struct{
 //assinaturas
 void escolhenumeros(int *ptr, int posicao);
 void verificavalores(char *string, t_lista *lista);
+char *escolhertime(t_lista *lista);
 void iniciarjogo();
 t_lista *aloca_lista();
 int esta_vazia(t_lista *lista);
@@ -118,12 +119,57 @@ void verificavalores(char *string, t_lista *lista){
 }
 
 //endverificavalores
+//escolhertime
+char *escolhertime(t_lista *lista){
+    t_elemento *aux=lista->primeiro;
+    int i=1,random,numerodotime;
+    printf("Escolha seu time\n\n");
+
+    while(i<=lista->quantidade){
+        random=rand()%4;
+        printf("Time %d:\n", i);
+        printf("Ataque: ");
+        if(random==0)
+            printf("%d ",aux->time->ataque);
+        else
+            printf("?? ");
+        printf("Defesa: ");
+        if(random==1)
+            printf("%d ", aux->time->defesa);
+        else
+            printf("?? ");
+        printf("Resistencia: ");
+        if(random==2)
+            printf("%d ", aux->time->resistencia);
+        else
+            printf("?? ");
+        printf("Velocidade: ");
+        if(random==3)
+            printf("%d\n\n", aux->time->velocidade);
+        else
+            printf("??\n\n");
+        i++;
+        aux=aux->proximo;
+    }
+    scanf("%d", &numerodotime);
+    aux=lista->primeiro;
+    if(numerodotime==1)
+        return aux->time->nome;
+    else{
+        for(i=1;i<numerodotime;i++){
+            aux=aux->proximo;
+        }
+        return aux->time->nome;
+    }
+}
+//endescolhertime
 //iniciarjogo
 void iniciarjogo(){
     FILE *arquivo;
     t_lista *lista;
     int num,i,x,verificanum[16];
     char string[50];
+    char *timeescolhido;
     lista=aloca_lista();
     arquivo=fopen("teams.txt","r");
     escolhenumeros(verificanum,1);
@@ -134,9 +180,9 @@ void iniciarjogo(){
         }
         verificavalores(string, lista);
         rewind(arquivo);
-        printf("%s\n",string);
     }
-    printf("%s\n", lista->primeiro->time->nome);
+    timeescolhido=escolhertime(lista);
+    printf("%s\n", timeescolhido);
     fclose(arquivo);
     return;
 }
