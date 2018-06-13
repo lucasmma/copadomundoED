@@ -75,7 +75,7 @@ void escolhenumeros(int *ptr,int posicao){
 //endescolhenumeros
 //verificavalores
 void verificavalores(char *string, t_lista *lista){
-    int i=0,aux;
+    int i=0,aux,ataque,defesa,resistencia,velocidade;
     char nome[20], atk[10], def[10], resist[10], vel[10];
     while(string[i]!=','){
         nome[i]=string[i];
@@ -89,6 +89,7 @@ void verificavalores(char *string, t_lista *lista){
         i++;
     }
     atk[i-aux]='\0';
+    ataque=atoi(atk);
     i+=2;
     aux=i;
     while(string[i]!=','){
@@ -96,6 +97,7 @@ void verificavalores(char *string, t_lista *lista){
         i++;
     }
     def[i-aux]='\0';
+    defesa=atoi(def);
     i+=2;
     aux=i;
     while(string[i]!=','){
@@ -103,6 +105,7 @@ void verificavalores(char *string, t_lista *lista){
         i++;
     }
     resist[i-aux]='\0';
+    resistencia=atoi(resist);
     i+=2;
     aux=i;
     while(string[i]!='\0'){
@@ -110,6 +113,8 @@ void verificavalores(char *string, t_lista *lista){
         i++;
     }
     vel[i-aux]='\0';
+    velocidade=atoi(vel);
+    inserir_final(nome,ataque,defesa,resistencia,velocidade,lista);
 }
 
 //endverificavalores
@@ -126,11 +131,12 @@ void iniciarjogo(){
         printf("%d ", verificanum[i]);
         for(x=-1;x<verificanum[i];x++){
             fgets(string,sizeof(string),arquivo);
-            verificavalores(string, lista);
         }
+        verificavalores(string, lista);
         rewind(arquivo);
         printf("%s\n",string);
     }
+    printf("%s\n", lista->primeiro->time->nome);
     fclose(arquivo);
     return;
 }
@@ -179,6 +185,7 @@ team *criatime(char *nome, int ataque, int defesa, int resistencia, int velocida
     if(ptr==NULL){
         return NULL;
     }
+    ptr->nome=(char*)malloc(sizeof(char)*30);
     strcpy(ptr->nome, nome);
     ptr->ataque=ataque;
     ptr->defesa=defesa;
@@ -207,9 +214,8 @@ int inserir_final(char *nome, int ataque, int defesa, int resistencia, int veloc
     if(lista==NULL)
         return FALSE;
     t_elemento *ptr= aloca_elemento(nome,ataque,defesa,resistencia,velocidade);
-    if(ptr==NULL)
-        return FALSE;
     ptr->anterior=lista->ultimo;
+    ptr->proximo=lista->primeiro;
     if(lista->primeiro==NULL){
         lista->primeiro=ptr;
         lista->ultimo=ptr;
