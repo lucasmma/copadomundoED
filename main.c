@@ -43,6 +43,8 @@ typedef struct{
 } t_lista;
 
 //assinaturas
+void teamfree(team *ptr);
+void destroirtree(t_node *tree);
 void comecarjogo(t_node *ptr, char *timeescolhido);
 void inserirtimes(t_lista *lista, t_node *tree);
 t_node *node_create();
@@ -62,6 +64,24 @@ t_elemento *aloca_elemento(char *nome, int ataque, int defesa, int resistencia, 
 //endassinaturas
 
 //funcoes
+//teamfree
+void teamfree(team *ptr){
+    free(ptr->nome);
+    free(ptr);
+    return;
+}
+//endteamfree
+//destroirtree
+void destroirtree(t_node *tree){
+    t_node *aux;
+    for(int i=31;i>=1;i--){
+        aux=acharelemento(tree,i);
+        teamfree(aux->time);
+        free(aux);
+    }
+    return;
+}
+//enddestroirtree
 //match
 team *match(team *time1, team *time2, int atributo){
     if(atributo==1){
@@ -94,6 +114,7 @@ team *match(team *time1, team *time2, int atributo){
 void comecarjogo(t_node *ptr, char *timeescolhido){
     t_node *aux;
     int atributo;
+    int vetordeatributos[15];
     for(int i=15;i>0;i--){
         aux=acharelemento(ptr,i);
         if(strcmp(aux->left->time->nome,timeescolhido)==0||strcmp(aux->right->time->nome,timeescolhido)==0){
@@ -140,6 +161,7 @@ void comecarjogo(t_node *ptr, char *timeescolhido){
                 atributo=4;
             aux->time=match(aux->left->time, aux->right->time, atributo);
         }
+        vetordeatributos[i-1]=atributo;
     }
     printf("Venceu o jogo\n");
     return;
@@ -355,6 +377,7 @@ void iniciarjogo(){
         printf("%s\n", ptr->time->nome);
     }*/
     comecarjogo(tree,timeescolhido);
+    destroirtree(tree);//implementar
     return;
 }
 //endiniciarjogo
@@ -367,7 +390,7 @@ void menu(){
         printf("[2]- Sair\n");
         scanf("%d", &flag);
         if(flag==1){
-            iniciarjogo();//implementar
+            iniciarjogo();
         }
         else if(flag==2){
             return;
@@ -465,12 +488,7 @@ void apaga_lista(t_lista *lista){
 }
 //end apaga_lista
 
-
-
 //endfuncoes
-
-
-
 
 int main(){
     srand(time(NULL));
