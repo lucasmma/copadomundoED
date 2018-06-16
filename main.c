@@ -43,6 +43,7 @@ typedef struct{
 } t_lista;
 
 //assinaturas
+void comecarjogo(t_node *ptr, char *timeescolhido);
 void inserirtimes(t_lista *lista, t_node *tree);
 t_node *node_create();
 t_node *tree_create();
@@ -61,6 +62,89 @@ t_elemento *aloca_elemento(char *nome, int ataque, int defesa, int resistencia, 
 //endassinaturas
 
 //funcoes
+//match
+team *match(team *time1, team *time2, int atributo){
+    if(atributo==1){
+        if(time1->ataque<time2->ataque)
+            return time2;
+        else
+            return time1;
+    }
+    else if(atributo==2){
+        if(time1->defesa<time2->defesa)
+            return time2;
+        else
+            return time1;
+    }
+        else if(atributo==3){
+            if(time1->resistencia<time2->resistencia)
+                return time2;
+            else
+                return time1;
+        }
+            else if(atributo==4){
+                if(time1->velocidade<time2->velocidade)
+                    return time2;
+                else
+                    return time1;
+            }
+}
+//endmatch
+//comecarjogo
+void comecarjogo(t_node *ptr, char *timeescolhido){
+    t_node *aux;
+    int atributo;
+    for(int i=15;i>0;i--){
+        aux=acharelemento(ptr,i);
+        if(strcmp(aux->left->time->nome,timeescolhido)==0||strcmp(aux->right->time->nome,timeescolhido)==0){
+            if(i>=8)
+                printf("OITAVAS DE FINAL\n\n");
+            else if(i>=4)
+                printf("QUARTAS DE FINAL\n\n");
+                else if(i>=2)
+                    printf("SEMI-FINAL\n\n");
+                    else
+                        printf("FINAL");
+            if(strcmp(aux->left->time->nome,timeescolhido)==0){
+                printf("Seu time %s\n",aux->left->time->nome);
+                printf("1) Ataque        : %d\n",aux->left->time->ataque);
+                printf("2) Defesa        : %d\n",aux->left->time->defesa);
+                printf("3) Resistencia   : %d\n",aux->left->time->resistencia);
+                printf("4) Velocidade   : %d\n\n",aux->left->time->velocidade);
+                printf("Seu adversario: %s\n\n",aux->right->time->nome);
+                printf("Selecione um atributo: ");
+                scanf("%d", &atributo);
+            }
+            else{
+                printf("Seu time %s\n",aux->right->time->nome);
+                printf("1) Ataque        : %d\n",aux->right->time->ataque);
+                printf("2) Defesa        : %d\n",aux->right->time->defesa);
+                printf("3) Resistencia   : %d\n",aux->right->time->resistencia);
+                printf("4) Velocidade   : %d\n\n",aux->right->time->velocidade);
+                printf("Seu adversario: %s\n\n",aux->left->time->nome);
+                printf("Selecione um atributo: ");
+                scanf("%d", &atributo);
+            }
+            aux->time=match(aux->left->time,aux->right->time, atributo);
+            if(strcmp(aux->time->nome,timeescolhido)==0){
+                printf("Voce venceu a partida prepare para a proxima partida\n");
+            }
+            else{
+                printf("voce perdeu.\n");
+                return;
+            }
+        }
+        else{
+            atributo=rand() % 4;
+            if(atributo==0)
+                atributo=4;
+            aux->time=match(aux->left->time, aux->right->time, atributo);
+        }
+    }
+    printf("Venceu o jogo\n");
+    return;
+}
+//endcomecarjogo
 //inserirtimes
 void inserirtimes(t_lista *lista, t_node *tree){
     t_elemento *ptrlista;
@@ -73,11 +157,13 @@ void inserirtimes(t_lista *lista, t_node *tree){
         ptrlista=ptrlista->proximo;
     }
     ptrlista=lista->primeiro;
-    for(i=1; i<=15; i++){
+    for(i=1; i<16; i++){
         ptrlista->anterior=NULL;
         ptrlista=ptrlista->proximo;
         ptrlista->anterior->proximo=NULL;
+        free(ptrlista->anterior);
     }
+    free(ptrlista);
     lista->primeiro=NULL;
     lista->ultimo=NULL;
     free(lista);
@@ -264,10 +350,11 @@ void iniciarjogo(){
     tree=tree_create();
     inserirtimes(lista,tree);
     printf("%s\n\n", timeescolhido);
-    for(i=16;i<=31;i++){
+    /*for(i=16;i<=31;i++){
         ptr=acharelemento(tree, i);
         printf("%s\n", ptr->time->nome);
-    }
+    }*/
+    comecarjogo(tree,timeescolhido);
     return;
 }
 //endiniciarjogo
@@ -275,6 +362,7 @@ void iniciarjogo(){
 void menu(){
     int flag;
     while(1){
+        system("clear");
         printf("[1]- Iniciar jogo\n");
         printf("[2]- Sair\n");
         scanf("%d", &flag);
