@@ -24,6 +24,12 @@ typedef struct t_team{
     int velocidade; // 0 a 100
 } team;
 
+typedef struct node{
+    team* time;
+    struct node* left;
+    struct node* right;
+} t_node;
+
 typedef struct elemento{
     struct elemento *anterior;
     team *time;
@@ -37,12 +43,17 @@ typedef struct{
 } t_lista;
 
 //assinaturas
+void inserirtimes(t_lista *lista, t_node *tree);
+t_node *node_create();
+t_node *tree_create();
+t_node *acharelemento(t_node *ptr, int posicao);
 void escolhenumeros(int *ptr, int posicao);
 void verificavalores(char *string, t_lista *lista);
 char *escolhertime(t_lista *lista);
 void iniciarjogo();
 t_lista *aloca_lista();
 int esta_vazia(t_lista *lista);
+team *team_create(char *nome, int ataque, int defesa, int resistencia, int velocidade);
 void apaga_lista(t_lista *lista);
 void remove_elemento(t_elemento *elemento);
 int inserir_final(char *nome, int ataque, int defesa, int resistencia, int velocidade, t_lista *lista);
@@ -50,6 +61,71 @@ t_elemento *aloca_elemento(char *nome, int ataque, int defesa, int resistencia, 
 //endassinaturas
 
 //funcoes
+//inserirtimes
+void inserirtimes(t_lista *lista, t_node *tree){
+    t_elemento *ptrlista;
+    t_node *ptrtree;
+    int i;
+    ptrlista=lista->primeiro;
+    for(i=16;i<=31;i++){
+        ptrtree=acharelemento(tree, i);
+        ptrtree->time=ptrlista->time;
+        ptrlista=ptrlista->proximo;
+    }
+    ptrlista=lista->primeiro;
+    for(i=1; i<=15; i++){
+        ptrlista->anterior=NULL;
+        ptrlista=ptrlista->proximo;
+        ptrlista->anterior->proximo=NULL;
+    }
+    lista->primeiro=NULL;
+    lista->ultimo=NULL;
+    free(lista);
+    return;
+}
+//endinserirtimes
+//node_create
+t_node *node_create(){
+    t_node *ptr= (t_node*) malloc(sizeof(t_node));
+    ptr->time = NULL;
+    ptr->left = NULL;
+    ptr->right = NULL;
+    return ptr;
+}
+//endnode_create
+//tree_create
+t_node *tree_create(){
+    t_node *ptr=node_create();
+    t_node *aux;
+    for(int i=2;i<=31;i++){
+        aux=acharelemento(ptr, i/2);
+        if(i%2==0){
+            aux->left=node_create();
+        }
+        else{
+            aux->right=node_create();
+        }
+    }
+    return ptr;
+}
+//endtree_create
+//percorretree
+t_node *acharelemento(t_node *ptr, int posicao){
+    t_node *aux=ptr;
+    if(posicao==1)
+        return aux;
+    int resto=posicao%2;
+    posicao=(posicao-resto)/2;
+    if(resto==0){
+        aux=acharelemento(aux,posicao);
+        aux=aux->left;
+        return aux;
+    }
+    aux=acharelemento(aux,posicao);
+    aux=aux->right;
+    return aux;
+}
+//endpercorretree
 //escolhenumeros
 void escolhenumeros(int *ptr,int posicao){
     int random,flag=1,i;
@@ -123,7 +199,7 @@ void verificavalores(char *string, t_lista *lista){
 char *escolhertime(t_lista *lista){
     t_elemento *aux=lista->primeiro;
     int i=1,random,numerodotime;
-    printf("Escolha seu time\n\n");
+    printf("\nEscolha seu time\n\n");
 
     while(i<=lista->quantidade){
         random=rand()%4;
@@ -167,6 +243,8 @@ char *escolhertime(t_lista *lista){
 void iniciarjogo(){
     FILE *arquivo;
     t_lista *lista;
+    t_node *tree;
+    t_node *ptr;
     int num,i,x,verificanum[16];
     char string[50];
     char *timeescolhido;
@@ -181,9 +259,15 @@ void iniciarjogo(){
         verificavalores(string, lista);
         rewind(arquivo);
     }
-    timeescolhido=escolhertime(lista);
-    printf("%s\n", timeescolhido);
     fclose(arquivo);
+    timeescolhido=escolhertime(lista);
+    tree=tree_create();
+    inserirtimes(lista,tree);
+    printf("%s\n\n", timeescolhido);
+    for(i=16;i<=31;i++){
+        ptr=acharelemento(tree, i);
+        printf("%s\n", ptr->time->nome);
+    }
     return;
 }
 //endiniciarjogo
@@ -226,7 +310,7 @@ int esta_vazia(t_lista *lista){
 }
 //endesta_vazia
 //teamcreate
-team *criatime(char *nome, int ataque, int defesa, int resistencia, int velocidade){
+team *team_create(char *nome, int ataque, int defesa, int resistencia, int velocidade){
     team *ptr = (team*) malloc(sizeof(team));
     if(ptr==NULL){
         return NULL;
@@ -247,7 +331,7 @@ t_elemento *aloca_elemento(char *nome, int ataque, int defesa, int resistencia, 
     if(ptr==NULL)
         return NULL;
 
-    ptr->time = criatime(nome, ataque, defesa, resistencia, velocidade);
+    ptr->time = team_create(nome, ataque, defesa, resistencia, velocidade);
 
     ptr->proximo=NULL;
     ptr->anterior=NULL;
