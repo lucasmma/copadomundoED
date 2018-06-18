@@ -43,6 +43,8 @@ typedef struct{
 } t_lista;
 
 //assinaturas
+void menu();
+void printaarvore(t_node *tree, int *vetordeatributos, int i);
 void teamfree(team *ptr);
 void destroirtree(t_node *tree);
 void comecarjogo(t_node *ptr, char *timeescolhido);
@@ -64,9 +66,40 @@ t_elemento *aloca_elemento(char *nome, int ataque, int defesa, int resistencia, 
 //endassinaturas
 
 //funcoes
+//printaarvore
+void printaarvore(t_node *tree, int *vetordeatributos, int i){
+    t_node *aux;
+    printf("Jogos da Copa\n");
+    for(int x=15;x>=i;x--){
+        if(x==15)
+            printf("\nOITAVAS DE FINAL:\n");
+        else if(x==7)
+            printf("\nQUARTAS DE FINAL:\n");
+            else if(x==3)
+                printf("\nSEMI-FINAL:\n");
+                else if(x==1)
+                    printf("\nFINAL:\n");
+        aux=acharelemento(tree,x);
+        if(vetordeatributos[x-1]==1){
+            printf("%s (Ataque %d) x %s (Ataque %d)\n", aux->left->time->nome,aux->left->time->ataque,aux->right->time->nome,aux->right->time->ataque);
+        }
+            else if(vetordeatributos[x-1]==2){
+                printf("%s (Defesa %d) x %s (Defesa %d)\n", aux->left->time->nome,aux->left->time->defesa,aux->right->time->nome,aux->right->time->defesa);
+            }
+                else if(vetordeatributos[x-1]==3){
+                    printf("%s (Resistencia %d) x %s (Resistencia %d)\n", aux->left->time->nome,aux->left->time->resistencia,aux->right->time->nome,aux->right->time->resistencia);
+                }
+                    else if(vetordeatributos[x-1]==4){
+                        printf("%s (Velocidade %d) x %s (Velocidade %d)\n", aux->left->time->nome,aux->left->time->velocidade,aux->right->time->nome,aux->right->time->velocidade);
+                    }
+    }
+    return;
+}
+//endprintaarvore
 //teamfree
 void teamfree(team *ptr){
-    free(ptr->nome);
+    if(ptr->nome[0]!='\0')
+        free(ptr->nome);
     free(ptr);
     return;
 }
@@ -76,7 +109,8 @@ void destroirtree(t_node *tree){
     t_node *aux;
     for(int i=31;i>=1;i--){
         aux=acharelemento(tree,i);
-        teamfree(aux->time);
+        if(i>15&&i<=32)
+            teamfree(aux->time);
         free(aux);
     }
     return;
@@ -113,9 +147,9 @@ team *match(team *time1, team *time2, int atributo){
 //comecarjogo
 void comecarjogo(t_node *ptr, char *timeescolhido){
     t_node *aux;
-    int atributo;
-    int vetordeatributos[15];
-    for(int i=15;i>0;i--){
+    int atributo,i,flag=0;
+    int vetordeatributos[15], atributoescolhido=0;
+    for(i=15;i>0;i--){
         aux=acharelemento(ptr,i);
         if(strcmp(aux->left->time->nome,timeescolhido)==0||strcmp(aux->right->time->nome,timeescolhido)==0){
             if(i>=8)
@@ -125,34 +159,83 @@ void comecarjogo(t_node *ptr, char *timeescolhido){
                 else if(i>=2)
                     printf("SEMI-FINAL\n\n");
                     else
-                        printf("FINAL");
+                        printf("FINAL\n\n");
             if(strcmp(aux->left->time->nome,timeescolhido)==0){
                 printf("Seu time %s\n",aux->left->time->nome);
-                printf("1) Ataque        : %d\n",aux->left->time->ataque);
-                printf("2) Defesa        : %d\n",aux->left->time->defesa);
-                printf("3) Resistencia   : %d\n",aux->left->time->resistencia);
-                printf("4) Velocidade   : %d\n\n",aux->left->time->velocidade);
+                if(atributoescolhido==1)
+                    printf("XX) XX           : XX\n");
+                else
+                    printf("1) Ataque        : %d\n",aux->left->time->ataque);
+                if(atributoescolhido==2)
+                    printf("XX) XX           : XX\n");
+                else
+                    printf("2) Defesa        : %d\n",aux->left->time->defesa);
+                if(atributoescolhido==3)
+                    printf("XX) XX           : XX\n");
+                else
+                    printf("3) Resistencia   : %d\n",aux->left->time->resistencia);
+                if (atributoescolhido==4)
+                    printf("XX) XX           : XX\n");
+                else
+                    printf("4) Velocidade    : %d\n\n",aux->left->time->velocidade);
                 printf("Seu adversario: %s\n\n",aux->right->time->nome);
                 printf("Selecione um atributo: ");
                 scanf("%d", &atributo);
+                while(atributo==atributoescolhido){
+                    printf("O atributo escolhido esta indisponivel.\n");
+                    printf("Selecione outro atributo: ");
+                    scanf("%d", &atributo);
+                }
             }
             else{
                 printf("Seu time %s\n",aux->right->time->nome);
-                printf("1) Ataque        : %d\n",aux->right->time->ataque);
-                printf("2) Defesa        : %d\n",aux->right->time->defesa);
-                printf("3) Resistencia   : %d\n",aux->right->time->resistencia);
-                printf("4) Velocidade   : %d\n\n",aux->right->time->velocidade);
+                if(atributoescolhido==1)
+                    printf("XX) XX           : XX\n");
+                else
+                    printf("1) Ataque        : %d\n",aux->right->time->ataque);
+                if(atributoescolhido==2)
+                    printf("XX) XX           : XX\n");
+                else
+                    printf("2) Defesa        : %d\n",aux->right->time->defesa);
+                if(atributoescolhido==3)
+                    printf("XX) XX           : XX\n");
+                else
+                    printf("3) Resistencia   : %d\n",aux->right->time->resistencia);
+                if (atributoescolhido==4)
+                    printf("XX) XX           : XX\n");
+                else
+                    printf("4) Velocidade    : %d\n\n",aux->right->time->velocidade);
                 printf("Seu adversario: %s\n\n",aux->left->time->nome);
                 printf("Selecione um atributo: ");
                 scanf("%d", &atributo);
+                while(atributo==atributoescolhido){
+                    printf("O atributo escolhido esta indisponivel.\n");
+                    printf("Selecione outro atributo: ");
+                    scanf("%d", &atributo);
+                }
             }
+            atributoescolhido=atributo;
             aux->time=match(aux->left->time,aux->right->time, atributo);
             if(strcmp(aux->time->nome,timeescolhido)==0){
-                printf("Voce venceu a partida prepare para a proxima partida\n");
+                printf("Voce venceu a partida prepare para a proxima partida\n\n");
             }
             else{
-                printf("voce perdeu.\n");
-                return;
+                printf("Voce perdeu.\n");
+                vetordeatributos[i-1]=atributo;
+                printaarvore(ptr ,vetordeatributos,i);
+                while(flag!=1||flag!=2){
+                    printf("[1]-Voltar ao menu principal\n");
+                    printf("[2]-Sair do jogo\n");
+                    scanf("%d", &flag);
+                    if(flag==1){
+                        menu();
+                        return;
+                    }
+                    else if(flag==2)
+                        return;
+                    else
+                        printf("Tecla invalida, digite novamente\n");
+                }
             }
         }
         else{
@@ -164,7 +247,21 @@ void comecarjogo(t_node *ptr, char *timeescolhido){
         vetordeatributos[i-1]=atributo;
     }
     printf("Venceu o jogo\n");
-    return;
+    i++;
+    printaarvore(ptr, vetordeatributos, i);
+    while(flag!=1||flag!=2){
+        printf("[1]-Voltar ao menu principal\n");
+        printf("[2]-Sair do jogo\n");
+        scanf("%d", &flag);
+        if(flag==1){
+            menu();
+            return;
+        }
+        else if(flag==2)
+            return;
+        else
+            printf("Tecla invalida, digite novamente\n");
+    }
 }
 //endcomecarjogo
 //inserirtimes
@@ -354,6 +451,7 @@ void iniciarjogo(){
     t_node *tree;
     t_node *ptr;
     int num,i,x,verificanum[16];
+    memset(verificanum,100,sizeof(verificanum));
     char string[50];
     char *timeescolhido;
     lista=aloca_lista();
@@ -372,12 +470,8 @@ void iniciarjogo(){
     tree=tree_create();
     inserirtimes(lista,tree);
     printf("%s\n\n", timeescolhido);
-    /*for(i=16;i<=31;i++){
-        ptr=acharelemento(tree, i);
-        printf("%s\n", ptr->time->nome);
-    }*/
     comecarjogo(tree,timeescolhido);
-    destroirtree(tree);//implementar
+    destroirtree(tree);
     return;
 }
 //endiniciarjogo
@@ -391,6 +485,7 @@ void menu(){
         scanf("%d", &flag);
         if(flag==1){
             iniciarjogo();
+            return;
         }
         else if(flag==2){
             return;
